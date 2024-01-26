@@ -2,6 +2,10 @@ import numpy as np
 import pandas
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+from sklearn.naive_bayes import GaussianNB
+
+# Metrics
+from sklearn.metrics import confusion_matrix, accuracy_score
 
 import os
 
@@ -66,3 +70,21 @@ pca_ax.set_xlabel("PC 1")
 pca_ax.set_title(f'Feature projection via PCA, Prop. of total var: {explained_vars_cum[1].round(2)} ')
 
 pca_fig.savefig("vowel/PC_2D.pdf")
+
+# Naive Bayes classifier
+
+# Extract test features and labels
+
+vowel_test_features = vowel_test.drop('y', axis = 1)
+vowel_test_labels = vowel_test['y']
+
+naive_bayes = GaussianNB() # Label distribution is uniform
+naive_bayes.fit(vowel_train_features, vowel_train_labels)
+
+bayes_pred_labels = naive_bayes.predict(vowel_test_features)
+
+bayes_acc = accuracy_score(vowel_test_labels, bayes_pred_labels)
+
+# Plot the confusion matrix of the Naive Bayes classifier
+
+conf_matr = confusion_matrix(vowel_test_labels, bayes_pred_labels)
