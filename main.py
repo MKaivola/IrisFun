@@ -48,7 +48,7 @@ var_bar_fig, var_bar_ax = plt.subplots()
 
 var_bar_ax.bar(np.arange(1, vowel_PCA.n_components_ + 1 ), explained_vars_cum)
 var_bar_ax.set_xlabel("Principal component")
-var_bar_ax.set_ylabel("Prop. of variance accounted")
+var_bar_ax.set_ylabel("Cumulative prop. of variance accounted")
 var_bar_ax.set_title("Distribution of variance over PCs")
 
 var_bar_ax.axhline(0.9, ls = '--', c = 'red')
