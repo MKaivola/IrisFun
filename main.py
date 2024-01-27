@@ -9,6 +9,8 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 
 import os
 
+# User methods
+import utils
 
 
 # Read train and test data
@@ -87,4 +89,7 @@ bayes_acc = accuracy_score(vowel_test_labels, bayes_pred_labels)
 
 # Plot the confusion matrix of the Naive Bayes classifier
 
-conf_matr = confusion_matrix(vowel_test_labels, bayes_pred_labels)
+conf_matr = confusion_matrix(vowel_test_labels, bayes_pred_labels, normalize = "true")
+
+vowel_labels = np.arange(1, np.max(vowel_test_labels) + 1)
+utils.heat_map_plot(conf_matr, vowel_labels, vowel_labels, "vowel/conf_matr_naive_bayes.pdf")
