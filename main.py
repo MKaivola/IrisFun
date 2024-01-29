@@ -93,3 +93,11 @@ conf_matr = confusion_matrix(vowel_test_labels, bayes_pred_labels, normalize = "
 
 vowel_labels = np.arange(1, np.max(vowel_test_labels) + 1)
 utils.heat_map_plot(conf_matr, vowel_labels, vowel_labels, "vowel/conf_matr_naive_bayes.pdf")
+
+# Plot the ROC curve 
+
+naive_bayes_test_probs = naive_bayes.predict_proba(vowel_test_features)
+
+utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels,
+                          naive_bayes_test_probs,
+                          "Naive Bayes", "vowel/micro_avg_ROC_naive_bayes.pdf")
