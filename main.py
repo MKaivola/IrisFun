@@ -92,9 +92,14 @@ std_scaler = StandardScaler().fit(vowel_train_features)
 vowel_train_feat_std = std_scaler.transform(vowel_train_features)
 vowel_test_feat_std = std_scaler.transform(vowel_test_features)
 
+# Modeling
+
+model_dict = {}
+
 # Naive Bayes classifier
 
 naive_bayes = GaussianNB() # Label distribution is uniform
+model_dict["Naive Bayes"] = naive_bayes
 naive_bayes.fit(vowel_train_feat_std, vowel_train_labels)
 
 bayes_pred_labels = naive_bayes.predict(vowel_test_feat_std)
@@ -120,6 +125,7 @@ utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels,
 # LDA and QDA
 
 lda_model = LinearDiscriminantAnalysis()
+model_dict["LDA"] = lda_model
 lda_model.fit(vowel_train_feat_std, vowel_train_labels)
 
 # 2D representation of the data using LDA dimensionality reduction
@@ -146,3 +152,17 @@ log_reg_test_probs = log_reg.predict_proba(vowel_test_feat_std)
 utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels,
                           log_reg_test_probs,
                           "Logistic Regression", "vowel/micro_avg_ROC_log_reg.pdf")
+
+
+# Print the accuracy of the evaluated models
+
+acc_output = "Model accuracies: "
+
+for model_name, model in model_dict.items():
+    model_acc = model.score(vowel_test_feat_std, vowel_test_labels)
+    acc_output = acc_output + f"{model_name} {round(model_acc, 2)}, "
+
+print(acc_output)
+
+
+
