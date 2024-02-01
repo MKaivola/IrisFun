@@ -9,6 +9,8 @@ from sklearn.decomposition import PCA
 
 # Models
 from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.linear_model import LogisticRegression
 
 # Metrics
@@ -113,6 +115,24 @@ naive_bayes_test_probs = naive_bayes.predict_proba(vowel_test_feat_std)
 utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels,
                           naive_bayes_test_probs,
                           "Naive Bayes", "vowel/micro_avg_ROC_naive_bayes.pdf")
+
+
+# LDA and QDA
+
+lda_model = LinearDiscriminantAnalysis()
+lda_model.fit(vowel_train_feat_std, vowel_train_labels)
+
+# 2D representation of the data using LDA dimensionality reduction
+
+test_data_LDA_proj = lda_model.transform(vowel_test_feat_std)
+
+lda_fig, lda_ax = plt.subplots()
+
+lda_ax.scatter(test_data_LDA_proj[:,0], test_data_LDA_proj[:,1], c = vowel_test_labels)
+lda_ax.set_ylabel("Canonical component 2")
+lda_ax.set_xlabel("Canonical component 1")
+
+lda_fig.savefig("vowel/LDA_proj.pdf")
 
 # Logistic Regression
 
