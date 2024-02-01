@@ -92,9 +92,9 @@ vowel_test_feat_std = std_scaler.transform(vowel_test_features)
 # Naive Bayes classifier
 
 naive_bayes = GaussianNB() # Label distribution is uniform
-naive_bayes.fit(vowel_train_features, vowel_train_labels)
+naive_bayes.fit(vowel_train_feat_std, vowel_train_labels)
 
-bayes_pred_labels = naive_bayes.predict(vowel_test_features)
+bayes_pred_labels = naive_bayes.predict(vowel_test_feat_std)
 
 bayes_acc = accuracy_score(vowel_test_labels, bayes_pred_labels)
 
@@ -107,7 +107,7 @@ utils.heat_map_plot(conf_matr, vowel_labels, vowel_labels, "vowel/conf_matr_naiv
 
 # Plot the ROC curve 
 
-naive_bayes_test_probs = naive_bayes.predict_proba(vowel_test_features)
+naive_bayes_test_probs = naive_bayes.predict_proba(vowel_test_feat_std)
 
 utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels,
                           naive_bayes_test_probs,
