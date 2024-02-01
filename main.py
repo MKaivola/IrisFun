@@ -1,7 +1,13 @@
+# Data processing and plotting
 import numpy as np
 import pandas
 import matplotlib.pyplot as plt
+
+# Preprocessing/Feature extraction
+from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+
+# Models
 from sklearn.naive_bayes import GaussianNB
 
 # Metrics
@@ -73,12 +79,17 @@ pca_ax.set_title(f'Feature projection via PCA, Prop. of total var: {explained_va
 
 pca_fig.savefig("vowel/PC_2D.pdf")
 
-# Naive Bayes classifier
-
-# Extract test features and labels
+# Preprocessing 
 
 vowel_test_features = vowel_test.drop('y', axis = 1)
 vowel_test_labels = vowel_test['y']
+
+std_scaler = StandardScaler().fit(vowel_train_features)
+
+vowel_train_feat_std = std_scaler.transform(vowel_train_features)
+vowel_test_feat_std = std_scaler.transform(vowel_test_features)
+
+# Naive Bayes classifier
 
 naive_bayes = GaussianNB() # Label distribution is uniform
 naive_bayes.fit(vowel_train_features, vowel_train_labels)
