@@ -9,6 +9,7 @@ from sklearn.decomposition import PCA
 
 # Models
 from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import LogisticRegression
 
 # Metrics
 from sklearn.metrics import confusion_matrix, accuracy_score
@@ -112,3 +113,16 @@ naive_bayes_test_probs = naive_bayes.predict_proba(vowel_test_feat_std)
 utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels,
                           naive_bayes_test_probs,
                           "Naive Bayes", "vowel/micro_avg_ROC_naive_bayes.pdf")
+
+# Logistic Regression
+
+log_reg = LogisticRegression(penalty = "l2", max_iter = 200)
+log_reg.fit(vowel_train_feat_std, vowel_train_labels)
+
+log_reg_pred_labels = log_reg.predict(vowel_test_feat_std)
+
+log_reg_test_probs = log_reg.predict_proba(vowel_test_feat_std)
+
+utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels,
+                          log_reg_test_probs,
+                          "Logistic Regression", "vowel/micro_avg_ROC_log_reg.pdf")
