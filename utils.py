@@ -44,8 +44,8 @@ def heat_map_plot(data_array: np.ndarray, xlabels: list, ylabels: list, filename
     fig.tight_layout()
     fig.savefig(filename)
 
-def roc_multiclass_plot(true_labels_train: np.ndarray, true_labels_test: np.ndarray, 
-                        predict_scores_test: np.ndarray, method: str,
+def roc_multiclass_plot(true_labels_train: np.ndarray, true_labels_test: np.ndarray, features_test: np.ndarray,
+                        model_dict: dict,
                         filename: str):
     """ 
     Plot a micro-averaged One-vs-Rest (OvR) ROC curve and save the figure to file system
@@ -56,10 +56,11 @@ def roc_multiclass_plot(true_labels_train: np.ndarray, true_labels_test: np.ndar
         A 2D array containing the true labels of the training set samples
     true_labels_test
         A 2D array containing the true labels of the test set samples
-    predict_scores_test
-        A 2D array containing the predicted scores of the test set samples
-    method:
-        A string containing the name of the classification method
+    features_test
+        A 2D array containing the features of the test set samples
+    model_dict:
+        A dictionary containing (model_name:str, model) key value pairs
+        which define a model name string and sklearn model pair
     filename:
         A string specifying the path to save the figure
 
@@ -69,17 +70,23 @@ def roc_multiclass_plot(true_labels_train: np.ndarray, true_labels_test: np.ndar
     binarizer = LabelBinarizer().fit(true_labels_train)
     binarized_labels_test = binarizer.transform(true_labels_test)
 
-    # Compute the micro-averaged OvR ROC curve
+    # Compute the micro-averaged OvR ROC curve for each model
 
-    roc_plot = RocCurveDisplay.from_predictions(y_true = binarized_labels_test.ravel(),
-                                                y_pred = predict_scores_test.ravel(),
-                                                name = "Micro-averaged OvR",
-                                                plot_chance_level = True,
-                                                color = 'blue')
-    roc_plot.ax_.set(
+    figure, ax = plt.subplots(figsize = (10,10))
+
+    for model_name, model in model_dict.items():
+
+        prob_predictions = model.predict_proba(features_test)
+
+        RocCurveDisplay.from_predictions(y_true = binarized_labels_test.ravel(),
+                                                y_pred = prob_predictions.ravel(),
+                                                name = f"Micro-Avg OvR: {model_name}",
+                                                ax = ax)
+   
+    ax.set(
         xlabel = "False positive rate",
         ylabel = "True positive rate",
-        title = f"Method: {method}"
+        title = "OvR ROC curves for vowel test data"
     )
 
-    roc_plot.figure_.savefig(filename)
+    figure.savefig(filename)

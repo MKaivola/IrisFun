@@ -92,45 +92,25 @@ std_scaler = StandardScaler().fit(vowel_train_features)
 vowel_train_feat_std = std_scaler.transform(vowel_train_features)
 vowel_test_feat_std = std_scaler.transform(vowel_test_features)
 
-# Modeling
+# Classification
 
-model_dict = {}
+# Initialize all models
+model_dict = {"Naive Bayes": GaussianNB(), "LDA": LinearDiscriminantAnalysis(),
+              "Logistic Regression": LogisticRegression(penalty = "l2", max_iter = 200)}
 
-# Naive Bayes classifier
+# Fit all models
 
-naive_bayes = GaussianNB() # Label distribution is uniform
-model_dict["Naive Bayes"] = naive_bayes
-naive_bayes.fit(vowel_train_feat_std, vowel_train_labels)
-
-bayes_pred_labels = naive_bayes.predict(vowel_test_feat_std)
-
-bayes_acc = accuracy_score(vowel_test_labels, bayes_pred_labels)
-
-# Plot the confusion matrix of the Naive Bayes classifier
-
-conf_matr = confusion_matrix(vowel_test_labels, bayes_pred_labels, normalize = "true")
-
-vowel_labels = np.arange(1, np.max(vowel_test_labels) + 1)
-utils.heat_map_plot(conf_matr, vowel_labels, vowel_labels, "vowel/conf_matr_naive_bayes.pdf")
-
-# Plot the ROC curve 
-
-naive_bayes_test_probs = naive_bayes.predict_proba(vowel_test_feat_std)
-
-utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels,
-                          naive_bayes_test_probs,
-                          "Naive Bayes", "vowel/micro_avg_ROC_naive_bayes.pdf")
+_ = [x.fit(vowel_train_feat_std, vowel_train_labels) for x in list(model_dict.values())]
 
 
-# LDA and QDA
+# Plot the Micro-Averaged ROC curves 
 
-lda_model = LinearDiscriminantAnalysis()
-model_dict["LDA"] = lda_model
-lda_model.fit(vowel_train_feat_std, vowel_train_labels)
+utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels, vowel_test_feat_std,
+                            model_dict, "vowel/micro_avg_ROC.pdf")
 
 # 2D representation of the data using LDA dimensionality reduction
 
-test_data_LDA_proj = lda_model.transform(vowel_test_feat_std)
+test_data_LDA_proj = model_dict["LDA"].transform(vowel_test_feat_std)
 
 lda_fig, lda_ax = plt.subplots()
 
@@ -139,20 +119,6 @@ lda_ax.set_ylabel("Canonical component 2")
 lda_ax.set_xlabel("Canonical component 1")
 
 lda_fig.savefig("vowel/LDA_proj.pdf")
-
-# Logistic Regression
-
-log_reg = LogisticRegression(penalty = "l2", max_iter = 200)
-log_reg.fit(vowel_train_feat_std, vowel_train_labels)
-
-log_reg_pred_labels = log_reg.predict(vowel_test_feat_std)
-
-log_reg_test_probs = log_reg.predict_proba(vowel_test_feat_std)
-
-utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels,
-                          log_reg_test_probs,
-                          "Logistic Regression", "vowel/micro_avg_ROC_log_reg.pdf")
-
 
 # Print the accuracy of the evaluated models
 
@@ -163,6 +129,3 @@ for model_name, model in model_dict.items():
     acc_output = acc_output + f"{model_name} {round(model_acc, 2)}, "
 
 print(acc_output)
-
-
-
