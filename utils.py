@@ -3,7 +3,12 @@ import numpy as np
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.metrics import RocCurveDisplay
 
-def heat_map_plot(data_array: np.ndarray, xlabels: list, ylabels: list, filename: str):
+from typing import Protocol
+
+class Scikit_Dimen_Reduct(Protocol):
+    def transform(self, X: np.ndarray) -> np.ndarray: ...
+
+def heat_map_plot(data_array: np.ndarray, xlabels: list, ylabels: list, filename: str) -> None:
     """
     Construct a heat map and save to file system
 
@@ -12,11 +17,11 @@ def heat_map_plot(data_array: np.ndarray, xlabels: list, ylabels: list, filename
     data_array
         2D array of numbers
     xlabels
-        A list specifying the xtick labels
+        List specifying the xtick labels
     ylabels
-        A list specifying the ytick labels
+        List specifying the ytick labels
     filename
-        A string specifying the path to save the figure
+        String specifying the path to save the figure
     """
 
     fig, ax = plt.subplots()
@@ -46,23 +51,23 @@ def heat_map_plot(data_array: np.ndarray, xlabels: list, ylabels: list, filename
 
 def roc_multiclass_plot(true_labels_train: np.ndarray, true_labels_test: np.ndarray, features_test: np.ndarray,
                         model_dict: dict,
-                        filename: str):
+                        filename: str) -> None:
     """ 
     Plot a micro-averaged One-vs-Rest (OvR) ROC curve and save the figure to file system
     
     Arguments
     ---------
     true_labels_train
-        A 2D array containing the true labels of the training set samples
+        1D array containing the true labels of the training set samples
     true_labels_test
-        A 2D array containing the true labels of the test set samples
+        1D array containing the true labels of the test set samples
     features_test
-        A 2D array containing the features of the test set samples
+        2D array containing the features of the test set samples
     model_dict:
-        A dictionary containing (model_name:str, model) key value pairs
+        Dictionary containing (model_name:str, model) key value pairs
         which define a model name string and sklearn model pair
     filename:
-        A string specifying the path to save the figure
+        String specifying the path to save the figure
 
     """
 
@@ -90,3 +95,38 @@ def roc_multiclass_plot(true_labels_train: np.ndarray, true_labels_test: np.ndar
     )
 
     figure.savefig(filename)
+
+    def dimen_reduct_plot(feat_mat: np.ndarray, labels: np.ndarray, method: Scikit_Dimen_Reduct,
+                     xlabel: str, ylabel: str, title: str, filename: str) -> None:
+        """"
+        Plot a 2D representation of the feature matrix, colored using the true labels
+        
+        Arguments
+        ---------
+        feat_mat
+            2D array containing the features of the samples
+        labels
+            1D array containing the true labels of the samples
+        method
+            scikit-learn class having a transform dimensionality reduction method
+        xlabel
+            String containing the x axis label of the figure
+        yabel
+            String containing the y axis label of the figure
+        title
+            String containing the title of the figure
+        filename
+            String specifying the path to save the figure
+
+        """
+
+        transform_mat = method.transform(feat_mat)
+
+        fig, ax = plt.subplots()
+
+        ax.scatter(transform_mat[:,0], transform_mat[:,1], c = labels)
+        ax.set_ylabel(ylabel)
+        ax.set_xlabel(xlabel)
+        ax.set_title(title)
+
+        fig.savefig(filename)
