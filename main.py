@@ -21,6 +21,7 @@ import os
 # User methods
 import utils
 
+### Data preprocessing ###
 
 # Read train and test data
 vowel_train, vowel_test = pandas.read_csv("vowel/vowel_train.csv"), \
@@ -31,11 +32,26 @@ vowel_train, vowel_test = pandas.read_csv("vowel/vowel_train.csv"), \
 vowel_train = vowel_train.drop(["row.names"], axis = 1)
 vowel_test = vowel_test.drop(["row.names"], axis = 1)
 
-# Descriptive statistics
+# Separate inputs and labels
+
+vowel_train_input = vowel_train.drop('y', axis = 1)
+vowel_train_labels = vowel_train['y']
+
+vowel_test_input = vowel_test.drop('y', axis = 1)
+vowel_test_labels = vowel_test['y']
+
+# Construct features by standardizing inputs
+
+std_scaler = StandardScaler().fit(vowel_train_input)
+
+vowel_train_feat = std_scaler.transform(vowel_train_input)
+vowel_test_feat = std_scaler.transform(vowel_test_input)
+
+### Descriptive statistics ###
 
 # Label distribution
 
-label_counts = vowel_train["y"].value_counts(normalize=True)
+label_counts = vowel_train_labels.value_counts(normalize=True)
 label_fig, label_ax = plt.subplots()
 
 label_ax.bar(label_counts.index.tolist(), label_counts)
@@ -47,13 +63,10 @@ label_fig.savefig("vowel/label_hist.pdf")
 
 # Label distribution is uniform
 
-# Analyze label distributions via PCA
-
-vowel_train_features = vowel_train.drop('y', axis = 1)
-vowel_train_labels = vowel_train['y']
+### PCA feature extraction ###
 
 vowel_PCA = PCA()
-vowel_PCA.fit(vowel_train_features)
+vowel_PCA.fit(vowel_train_feat)
 
 # Plot the cumulative explained variance as a barplot
 
@@ -70,29 +83,14 @@ var_bar_ax.axhline(0.9, ls = '--', c = 'red')
 
 var_bar_fig.savefig("vowel/PCA_var_dist.pdf")
 
-# Plot 2D rep
-vowel_feat_PCA_projec = vowel_PCA.transform(vowel_train_features)
+# Plot 2D representation using PCA
 
-pca_fig, pca_ax = plt.subplots()
+utils.dimen_reduct_plot(vowel_train_feat, vowel_train_labels, vowel_PCA,
+                  "PC 1", "PC 2",
+                  f'Feature projection via PCA, Prop. of total var: {explained_vars_cum[1].round(2)}',
+                  "vowel/PC_2D.pdf")
 
-pca_ax.scatter(vowel_feat_PCA_projec[:,0], vowel_feat_PCA_projec[:,1], c = vowel_train_labels)
-pca_ax.set_ylabel("PC 2")
-pca_ax.set_xlabel("PC 1")
-pca_ax.set_title(f'Feature projection via PCA, Prop. of total var: {explained_vars_cum[1].round(2)} ')
-
-pca_fig.savefig("vowel/PC_2D.pdf")
-
-# Preprocessing 
-
-vowel_test_features = vowel_test.drop('y', axis = 1)
-vowel_test_labels = vowel_test['y']
-
-std_scaler = StandardScaler().fit(vowel_train_features)
-
-vowel_train_feat_std = std_scaler.transform(vowel_train_features)
-vowel_test_feat_std = std_scaler.transform(vowel_test_features)
-
-# Classification
+### Classification ###
 
 # Initialize all models
 model_dict = {"Naive Bayes": GaussianNB(), "LDA": LinearDiscriminantAnalysis(),
@@ -100,32 +98,27 @@ model_dict = {"Naive Bayes": GaussianNB(), "LDA": LinearDiscriminantAnalysis(),
 
 # Fit all models
 
-_ = [x.fit(vowel_train_feat_std, vowel_train_labels) for x in list(model_dict.values())]
+_ = [x.fit(vowel_train_feat, vowel_train_labels) for x in list(model_dict.values())]
 
 
 # Plot the Micro-Averaged ROC curves 
 
-utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels, vowel_test_feat_std,
+utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels, vowel_test_feat,
                             model_dict, "vowel/micro_avg_ROC.pdf")
 
-# 2D representation of the data using LDA dimensionality reduction
+# 2D representation of the test data using LDA dimensionality reduction
 
-test_data_LDA_proj = model_dict["LDA"].transform(vowel_test_feat_std)
-
-lda_fig, lda_ax = plt.subplots()
-
-lda_ax.scatter(test_data_LDA_proj[:,0], test_data_LDA_proj[:,1], c = vowel_test_labels)
-lda_ax.set_ylabel("Canonical component 2")
-lda_ax.set_xlabel("Canonical component 1")
-
-lda_fig.savefig("vowel/LDA_proj.pdf")
+utils.dimen_reduct_plot(vowel_test_feat, vowel_test_labels, model_dict["LDA"],
+                  "Canonical component 1", "Canonical component 2",
+                  f'LDA projection to discriminant components',
+                  "vowel/LDA_proj.pdf")
 
 # Print the accuracy of the evaluated models
 
 acc_output = "Model accuracies: "
 
 for model_name, model in model_dict.items():
-    model_acc = model.score(vowel_test_feat_std, vowel_test_labels)
+    model_acc = model.score(vowel_test_feat, vowel_test_labels)
     acc_output = acc_output + f"{model_name} {round(model_acc, 2)}, "
 
 print(acc_output)

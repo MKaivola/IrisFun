@@ -96,37 +96,37 @@ def roc_multiclass_plot(true_labels_train: np.ndarray, true_labels_test: np.ndar
 
     figure.savefig(filename)
 
-    def dimen_reduct_plot(feat_mat: np.ndarray, labels: np.ndarray, method: Scikit_Dimen_Reduct,
+def dimen_reduct_plot(feat_mat: np.ndarray, labels: np.ndarray, method: Scikit_Dimen_Reduct,
                      xlabel: str, ylabel: str, title: str, filename: str) -> None:
-        """"
-        Plot a 2D representation of the feature matrix, colored using the true labels
-        
-        Arguments
-        ---------
-        feat_mat
-            2D array containing the features of the samples
-        labels
-            1D array containing the true labels of the samples
-        method
-            scikit-learn class having a transform dimensionality reduction method
-        xlabel
-            String containing the x axis label of the figure
-        yabel
-            String containing the y axis label of the figure
-        title
-            String containing the title of the figure
-        filename
-            String specifying the path to save the figure
+    """"
+    Plot a 2D representation of the feature matrix, colored using the true labels
+    
+    Arguments
+    ---------
+    feat_mat
+        2D array containing the features of the samples
+    labels
+        1D array containing the true labels of the samples
+    method
+        scikit-learn class having a transform dimensionality reduction method
+    xlabel
+        String containing the x axis label of the figure
+    yabel
+        String containing the y axis label of the figure
+    title
+        String containing the title of the figure
+    filename
+        String specifying the path to save the figure
 
-        """
+    """
 
-        transform_mat = method.transform(feat_mat)
+    transform_mat = method.transform(feat_mat)
 
-        fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
 
-        ax.scatter(transform_mat[:,0], transform_mat[:,1], c = labels)
-        ax.set_ylabel(ylabel)
-        ax.set_xlabel(xlabel)
-        ax.set_title(title)
+    ax.scatter(transform_mat[:,0], transform_mat[:,1], c = labels)
+    ax.set_ylabel(ylabel)
+    ax.set_xlabel(xlabel)
+    ax.set_title(title)
 
-        fig.savefig(filename)
+    fig.savefig(filename)
