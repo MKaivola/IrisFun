@@ -13,8 +13,14 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.linear_model import LogisticRegression
 
+# Model selection
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
+
 # Metrics
 from sklearn.metrics import confusion_matrix, accuracy_score
+
+# Distributions
+from scipy.stats import uniform
 
 import os
 
@@ -93,13 +99,20 @@ utils.dimen_reduct_plot(vowel_train_feat, vowel_train_labels, vowel_PCA,
 ### Classification ###
 
 # Initialize all models
-model_dict = {"Naive Bayes": GaussianNB(), "LDA": LinearDiscriminantAnalysis(),
+
+# Define hyperparameter grids and search instances for relevant methods
+
+lda_param_grid = {"shrinkage": np.concatenate(([0], uniform.rvs(size = 15, random_state = 0), [1]))}
+LDA_search = GridSearchCV(LinearDiscriminantAnalysis(solver="eigen"), lda_param_grid,
+                                n_jobs=-1)
+
+model_dict = {"Naive Bayes": GaussianNB(), "LDA": LDA_search,
+              "QDA": QuadraticDiscriminantAnalysis(),
               "Logistic Regression": LogisticRegression(penalty = "l2", max_iter = 200)}
 
 # Fit all models
 
 _ = [x.fit(vowel_train_feat, vowel_train_labels) for x in list(model_dict.values())]
-
 
 # Plot the Micro-Averaged ROC curves 
 
