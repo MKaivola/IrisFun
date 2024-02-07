@@ -25,7 +25,7 @@ from scipy.stats import uniform
 import os
 
 # User methods
-import utils
+import utils_plotting
 
 ### Data preprocessing ###
 
@@ -91,7 +91,7 @@ var_bar_fig.savefig("vowel/PCA_var_dist.pdf")
 
 # Plot 2D representation using PCA
 
-utils.dimen_reduct_plot(vowel_train_feat, vowel_train_labels, vowel_PCA,
+utils_plotting.dimen_reduct_plot(vowel_train_feat, vowel_train_labels, vowel_PCA,
                   "PC 1", "PC 2",
                   f'Feature projection via PCA, Prop. of total var: {explained_vars_cum[1].round(2)}',
                   "vowel/PC_2D.pdf")
@@ -116,12 +116,12 @@ _ = [x.fit(vowel_train_feat, vowel_train_labels) for x in list(model_dict.values
 
 # Plot the Micro-Averaged ROC curves 
 
-utils.roc_multiclass_plot(vowel_train_labels, vowel_test_labels, vowel_test_feat,
+utils_plotting.roc_multiclass_plot(vowel_train_labels, vowel_test_labels, vowel_test_feat,
                             model_dict, "vowel/micro_avg_ROC.pdf")
 
 # 2D representation of the test data using LDA dimensionality reduction
 
-utils.dimen_reduct_plot(vowel_test_feat, vowel_test_labels, model_dict["LDA"],
+utils_plotting.dimen_reduct_plot(vowel_test_feat, vowel_test_labels, model_dict["LDA"],
                   "Canonical component 1", "Canonical component 2",
                   f'LDA projection to discriminant components',
                   "vowel/LDA_proj.pdf")
