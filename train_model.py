@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import pandas
 import numpy as np
@@ -14,6 +15,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("filename_data",
         type=str, 
         help="Path to a csv file containing the training data")
+parser.add_argument("model_file",
+        type=str,
+        help="Path to the file where the learned model is stored")
 parser.add_argument("--filename_test",
         type=str, 
         help="Path to a csv file containing the test data")
@@ -37,11 +41,14 @@ if __name__ == '__main__':
     # Estimate generalization error via nested cross-validation
     model_cv = GridSearchCV(model_pipe, hyper_param_grid)
 
+    print("Estimating the generalization accuracy score using cross-validation...")
     model_performance = cross_val_score(model_cv, X, y)
     print(f"Cross-validated accuracy score: {np.round(model_performance.mean(), 2)}")
 
     # Learn model using all data
+    print("Learning the model using all data...")
     model_cv.fit(X, y)
 
     # Save final model
-    sio.dump(model_cv, "vowel_model.skops")
+    sio.dump(model_cv, args.model_file + ".skops")
+    print(f"Learned model saved at {os.path.abspath(args.model_file + '.skops')}")
