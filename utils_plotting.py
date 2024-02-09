@@ -3,10 +3,7 @@ import numpy as np
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.metrics import RocCurveDisplay
 
-from typing import Protocol
-
-class Scikit_Dimen_Reduct(Protocol):
-    def transform(self, X: np.ndarray) -> np.ndarray: ...
+import custom_types
 
 def heat_map_plot(data_array: np.ndarray, xlabels: list, ylabels: list, filename: str) -> None:
     """
@@ -96,7 +93,7 @@ def roc_multiclass_plot(true_labels_train: np.ndarray, true_labels_test: np.ndar
 
     figure.savefig(filename)
 
-def dimen_reduct_plot(feat_mat: np.ndarray, labels: np.ndarray, method: Scikit_Dimen_Reduct,
+def dimen_reduct_plot(feat_mat: np.ndarray, labels: np.ndarray, method: custom_types.Scikit_Dimen_Reduct,
                      xlabel: str, ylabel: str, title: str, filename: str) -> None:
     """"
     Plot a 2D representation of the feature matrix, colored using the true labels
