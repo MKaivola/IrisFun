@@ -10,6 +10,8 @@ from sklearn.model_selection import GridSearchCV, cross_val_score
 import skops.io as sio
 from scipy.stats import uniform
 
+import utils
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument("filename_data",
@@ -50,5 +52,4 @@ if __name__ == '__main__':
     model_cv.fit(X, y)
 
     # Save final model
-    sio.dump(model_cv, args.model_file + ".skops")
-    print(f"Learned model saved at {os.path.abspath(args.model_file + '.skops')}")
+    utils.save_model(args.model_file, model_cv)
