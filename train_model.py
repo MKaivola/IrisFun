@@ -1,7 +1,7 @@
 import argparse
 import os
 
-import pandas
+import pandas as pd
 import numpy as np
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import StandardScaler
@@ -27,9 +27,9 @@ parser.add_argument("--filename_test",
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    train_data = pandas.read_csv(args.filename_data)
+    train_data = pd.read_csv(args.filename_data)
 
-    # TODO: Input validation
+    utils.validate_input(train_data)
 
     X = train_data.drop(['row.names', 'y'], axis = 1)
     y = train_data['y']
