@@ -28,11 +28,15 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     train_data = pd.read_csv(args.filename_data)
-
     utils.validate_input(train_data)
 
-    X = train_data.drop(['row.names', 'y'], axis = 1)
-    y = train_data['y']
+    if args.filename_test is not None:
+        test_data = pd.read_csv(args.filename_test)
+        utils.validate_input(test_data)
+    else:
+        test_data = None
+
+    X_train, y_train = utils.preprocess_input(train_data)
 
     model_pipe = Pipeline([("scaler", StandardScaler()), ("LDA", LinearDiscriminantAnalysis(solver = 'eigen'))])
 
@@ -40,16 +44,33 @@ if __name__ == '__main__':
         "LDA__shrinkage": np.concatenate(([0], uniform.rvs(size = 15, random_state = 0), [1]))
     }
 
-    # Estimate generalization error via nested cross-validation
     model_cv = GridSearchCV(model_pipe, hyper_param_grid)
 
-    print("Estimating the generalization accuracy score using cross-validation...")
-    model_performance = cross_val_score(model_cv, X, y)
-    print(f"Cross-validated accuracy score: {np.round(model_performance.mean(), 2)}")
+    if test_data is not None:
+        # Estimate generalization error via test data
+
+        X_test, y_test = utils.preprocess_input(test_data)
+
+        model_cv.fit(X_train, y_train)
+
+        print("Estimating the generalization accuracy score using test data...")
+        test_accuracy = model_cv.score(X_test, y_test)
+
+        print(f"Test set accuracy score: {np.round(test_accuracy, 2)}")
+    else:
+        # Estimate generalization error via nested cross-validation
+        
+        print("Estimating the generalization accuracy score using cross-validation...")
+        model_performance = cross_val_score(model_cv, X_train, y_train)
+
+        print(f"Cross-validated accuracy score: {np.round(model_performance.mean(), 2)}")
 
     # Learn model using all data
+        
+    X_all, y_all = utils.preprocess_input(train_data, test_data)
+
     print("Learning the model using all data...")
-    model_cv.fit(X, y)
+    model_cv.fit(X_all, y_all)
 
     # Save final model
     utils.save_model(args.model_file, model_cv)
