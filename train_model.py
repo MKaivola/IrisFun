@@ -30,13 +30,13 @@ if __name__ == '__main__':
     train_data = pd.read_csv(args.filename_data)
     utils.validate_input(train_data)
 
+    X_train, y_train = utils.preprocess_input(train_data)
+
     if args.filename_test is not None:
         test_data = pd.read_csv(args.filename_test)
-        utils.validate_input(test_data)
+        utils.validate_input(test_data, train_data)
     else:
         test_data = None
-
-    X_train, y_train = utils.preprocess_input(train_data)
 
     model_pipe = Pipeline([("scaler", StandardScaler()), ("LDA", LinearDiscriminantAnalysis(solver = 'eigen'))])
 

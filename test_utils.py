@@ -27,9 +27,13 @@ class TestSaveModel():
 @pytest.fixture
 def panda_dataframe():
 
-    df = pd.DataFrame(np.zeros((10,10)))
+    n = 10
+
+    df = pd.DataFrame(np.zeros((n,n)))
 
     df = df.rename(columns = {0:'row.names', 1:'y'})
+
+    df['y'] = np.random.randint(low = 0, high = 5, size = n)
 
     return df
 
@@ -55,5 +59,22 @@ class TestValidateInput():
 
         with pytest.raises(TypeError):
             utils.validate_input(df)
+
+    def test_different_amounts_of_features(self, panda_dataframe):
+
+        df = panda_dataframe.assign(new_feature = np.repeat(0.0, panda_dataframe.shape[0]))
+
+        with pytest.raises(ValueError):
+            utils.validate_input(df, panda_dataframe)
+
+    def test_unobserved_class(self, panda_dataframe):
+
+        df = panda_dataframe.copy()
+
+        df['y'] = np.random.randint(low = 6, high = 10, size = panda_dataframe.shape[0])
+
+        with pytest.raises(ValueError):
+            utils.validate_input(df, panda_dataframe)
+
 
     

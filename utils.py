@@ -30,14 +30,18 @@ def save_model(filepath: str, model: custom_types.Scikit_Classifier) -> None:
 
     sio.dump(model, filepath)
 
-def validate_input(data_matrix: pd.DataFrame) -> None:
+def validate_input(data_matrix: pd.DataFrame, train_data_matrix: pd.DataFrame = None) -> None:
     """
     Check that the input data frame conforms to the preprocessing assumptions
+    Optionally, check that the data matrix contains only classes observed during training
+    and contains the correct amount of features relative to the training data
 
     Arguments
     ---------
     data_matrix
-        A pandas dataframe to be preprocessed
+        A pandas dataframe to be preprocessed and possibly checked against training data 
+    train_data_matrix
+        An optional validated pandas dataframe containing the training data
 
     """
     
@@ -53,6 +57,21 @@ def validate_input(data_matrix: pd.DataFrame) -> None:
     if not dtypes_is_numeric.drop('row.names').all():
         non_numeric_dims = np.nonzero(~dtypes_is_numeric)
         raise TypeError(f'Columns {col_names[non_numeric_dims]} are not numeric')
+    
+    if train_data_matrix is not None:
+
+        train_dims = train_data_matrix.shape
+        data_dims = data_matrix.shape
+
+        if train_dims[-1] != data_dims[-1]:
+            raise ValueError(f"The data matrices have different amounts of features. Expected {train_dims[-1]}, got {data_dims[-1]} instead.")
+
+        data_classes = set(data_matrix['y'])
+        train_data_classes = set(train_data_matrix['y'])
+
+        if not data_classes <= train_data_classes:
+            new_classes = data_classes.difference(train_data_classes)
+            raise ValueError(f"Unobserved classes in test data: {new_classes}")
 
 
 def preprocess_input(data_matrix_train: pd.DataFrame, data_matrix_test: pd.DataFrame = None) -> tuple[pd.DataFrame, pd.Series]:
