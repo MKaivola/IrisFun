@@ -10,7 +10,7 @@ from sklearn.model_selection import GridSearchCV, cross_val_score
 import skops.io as sio
 from scipy.stats import uniform
 
-import utils
+import utils_train
 
 parser = argparse.ArgumentParser()
 
@@ -28,13 +28,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     train_data = pd.read_csv(args.filename_data)
-    utils.validate_input(train_data)
+    utils_train.validate_input(train_data)
 
-    X_train, y_train = utils.preprocess_input(train_data)
+    X_train, y_train = utils_train.preprocess_input(train_data)
 
     if args.filename_test is not None:
         test_data = pd.read_csv(args.filename_test)
-        utils.validate_input(test_data, train_data)
+        utils_train.validate_input(test_data, train_data)
     else:
         test_data = None
 
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     if test_data is not None:
         # Estimate generalization error via test data
 
-        X_test, y_test = utils.preprocess_input(test_data)
+        X_test, y_test = utils_train.preprocess_input(test_data)
 
         model_cv.fit(X_train, y_train)
 
@@ -67,10 +67,10 @@ if __name__ == '__main__':
 
     # Learn model using all data
         
-    X_all, y_all = utils.preprocess_input(train_data, test_data)
+    X_all, y_all = utils_train.preprocess_input(train_data, test_data)
 
     print("Learning the model using all data...")
     model_cv.fit(X_all, y_all)
 
     # Save final model
-    utils.save_model(args.model_file, model_cv)
+    utils_train.save_model(args.model_file, model_cv)
