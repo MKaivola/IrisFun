@@ -2,12 +2,21 @@ import pytest
 from sklearn.dummy import DummyClassifier
 import numpy as np
 import pandas as pd
+import skops.io as sio
 
 import utils
+
+class UntrustedType():
+    def malicious_code(self):
+        pass
 
 @pytest.fixture
 def LearnedClassifier():
     return DummyClassifier()
+
+@pytest.fixture
+def UntrustedClass():
+    return UntrustedType()
 
 class TestSaveModel():
 
@@ -23,6 +32,26 @@ class TestSaveModel():
         utils.save_model((full_path / "test_model.skops").as_posix(), LearnedClassifier)
 
         assert full_path.exists()
+
+class TestLoadModel():
+    def test_incorrect_model_format(self, tmp_path, LearnedClassifier):
+
+        full_path = tmp_path / "vovel_model.dat"
+
+        sio.dump(LearnedClassifier, full_path)
+
+        with pytest.raises(ValueError):
+            utils.load_model(full_path.as_posix())
+
+    def test_untrusted_model_interrupt(self, tmp_path, UntrustedClass, monkeypatch):
+        
+        full_path = tmp_path / "untrusted_model.skops"
+
+        sio.dump(UntrustedClass, full_path) 
+
+        with pytest.raises(KeyboardInterrupt):
+            monkeypatch.setattr("builtins.input", lambda _: 'n')
+            utils.load_model(full_path.as_posix())
 
 @pytest.fixture
 def panda_dataframe():
