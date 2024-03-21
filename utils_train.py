@@ -6,6 +6,7 @@ import numpy as np
 import skops.io as sio
 
 import custom_types
+from utils import df_col_type_check
 
 def save_model(filepath: str, model: custom_types.Scikit_Classifier) -> None:
     """
@@ -50,13 +51,7 @@ def validate_input(data_matrix: pd.DataFrame, train_data_matrix: pd.DataFrame = 
     if 'row.names' not in col_names or 'y' not in col_names:
         raise KeyError("'row.names' or 'y' column is missing from the dataframe")
     
-    dtypes_data = data_matrix.dtypes
-
-    dtypes_is_numeric = dtypes_data.apply(pd.api.types.is_numeric_dtype)
-
-    if not dtypes_is_numeric.drop('row.names').all():
-        non_numeric_dims = np.nonzero(~dtypes_is_numeric)
-        raise TypeError(f'Columns {col_names[non_numeric_dims]} are not numeric')
+    df_col_type_check(data_matrix.drop('row.names', axis = 1))
     
     if train_data_matrix is not None:
 
