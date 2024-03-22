@@ -37,7 +37,9 @@ def load_model(filepath: str) -> custom_types.Scikit_Classifier:
         if answer == 'n':
             raise KeyboardInterrupt("The model file was not loaded, program interrupted")
         
-    sio.load(filepath, trusted = unknown_types)
+    loaded_model = sio.load(filepath, trusted = unknown_types)
+
+    return loaded_model
 
 def validate_input(data_matrix: pd.DataFrame, model: custom_types.Scikit_Classifier) -> None:
     """
