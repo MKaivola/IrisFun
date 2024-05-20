@@ -48,10 +48,10 @@ def validate_input(data_matrix: pd.DataFrame, train_data_matrix: pd.DataFrame = 
     
     col_names = data_matrix.columns
 
-    if 'row.names' not in col_names or 'y' not in col_names:
-        raise KeyError("'row.names' or 'y' column is missing from the dataframe")
+    if 'y' not in col_names:
+        raise KeyError("'y' column is missing from the dataframe")
     
-    df_col_type_check(data_matrix.drop('row.names', axis = 1))
+    df_col_type_check(data_matrix)
     
     if train_data_matrix is not None:
 
@@ -76,7 +76,7 @@ def preprocess_input(data_matrix_train: pd.DataFrame, data_matrix_test: pd.DataF
     if data_matrix_test is not None:
         data_matrix = pd.concat([data_matrix, data_matrix_test], axis = 0)
 
-    X = data_matrix.drop(['row.names', 'y'], axis = 1)
+    X = data_matrix.drop(['y'], axis = 1)
     y = data_matrix['y']
 
     return X, y

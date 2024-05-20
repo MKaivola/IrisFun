@@ -31,20 +31,13 @@ def panda_dataframe():
 
     df = pd.DataFrame(np.zeros((n,n)))
 
-    df = df.rename(columns = {0:'row.names', 1:'y'})
+    df = df.rename(columns = {0:'y'})
 
     df['y'] = np.random.randint(low = 0, high = 5, size = n)
 
     return df
 
 class TestValidateInput():
-
-    def test_missing_row_names(self, panda_dataframe):
-
-        df = panda_dataframe.drop('row.names', axis = 1)
-
-        with pytest.raises(KeyError):
-            utils_train.validate_input(df)
 
     def test_missing_y(self, panda_dataframe):
 

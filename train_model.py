@@ -3,6 +3,7 @@ import os
 
 import pandas as pd
 import numpy as np
+from sqlalchemy import select
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
@@ -11,29 +12,59 @@ import skops.io as sio
 from scipy.stats import uniform
 
 import utils_train
+from data.db_metadata import VowelDataBase
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("filename_data",
-        type=str, 
-        help="Path to a csv file containing the training data")
 parser.add_argument("model_file",
         type=str,
-        help="Path to the file where the learned model is stored")
-parser.add_argument("--filename_test",
-        type=str, 
-        help="Path to a csv file containing the test data")
+        help="Path to the file where the learned model will be stored")
+parser.add_argument("--use_test_data",
+        action="store_true", 
+        help="Flag to specify whether to use test data to evaluate model")
 
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    train_data = pd.read_csv(args.filename_data)
+    data_base = VowelDataBase("sqlite:///data/vowel_data.db")
+
+    select_train_data = select(data_base.train_data_table.c['y',
+                                                          'x_1',
+                                                          'x_2',
+                                                          'x_3',
+                                                          'x_4',
+                                                          'x_5',
+                                                          'x_6',
+                                                          'x_7',
+                                                          'x_8',
+                                                          'x_9',
+                                                          'x_10'])
+
+    list_of_train_rows = data_base.execute(select_train_data)
+
+    train_data = pd.DataFrame(list_of_train_rows)
     utils_train.validate_input(train_data)
 
     X_train, y_train = utils_train.preprocess_input(train_data)
 
-    if args.filename_test is not None:
-        test_data = pd.read_csv(args.filename_test)
+    if args.use_test_data:
+
+        select_test_data = select(data_base.test_data_table.c['y',
+                                                          'x_1',
+                                                          'x_2',
+                                                          'x_3',
+                                                          'x_4',
+                                                          'x_5',
+                                                          'x_6',
+                                                          'x_7',
+                                                          'x_8',
+                                                          'x_9',
+                                                          'x_10'])
+
+        list_of_test_rows = data_base.execute(select_test_data)
+
+        test_data = pd.DataFrame(list_of_test_rows)
+        
         utils_train.validate_input(test_data, train_data)
     else:
         test_data = None
