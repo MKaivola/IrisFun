@@ -46,7 +46,7 @@ def unlabeled_df():
 
     df = pd.DataFrame(np.random.rand(n,2))
 
-    df = df.rename(columns = {0:'row.names'})
+    df = df.rename(columns = {0:'row_name'})
 
     return df
 
@@ -56,7 +56,7 @@ def dummy_model(unlabeled_df):
 
     labels = np.random.randint(low = 0, high = 3, size = unlabeled_df.shape[0])
 
-    model.fit(unlabeled_df.drop('row.names', axis = 1), labels)
+    model.fit(unlabeled_df.drop('row_name', axis = 1), labels)
 
     return model
 
@@ -65,7 +65,7 @@ class TestValidateInput():
 
     def test_missing_row_names(self, unlabeled_df, dummy_model):
 
-        df = unlabeled_df.drop('row.names', axis = 1)
+        df = unlabeled_df.drop('row_name', axis = 1)
 
         with pytest.raises(KeyError):
             utils_predict.validate_input(df, dummy_model)

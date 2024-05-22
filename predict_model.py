@@ -1,34 +1,62 @@
 import argparse
 
 import pandas as pd
+from sqlalchemy import select, update, bindparam
+from sqlalchemy import Null
 
 import utils_predict
+from data.db_metadata import VowelDataBase
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("filename_new_data",
-        type=str, 
-        help="Path to a csv file containing the unlabeled data")
 parser.add_argument("model_file",
         type=str,
         help="Path to the file where the learned model is stored")
-parser.add_argument("output",
-        type=str,
-        help="Path to the desired csv output file")
 
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    unlabeled_data = pd.read_csv(args.filename_new_data)
+    data_base = VowelDataBase("sqlite:///data/vowel_data.db")
 
-    learned_model = utils_predict.load_model(args.model_file)
+    select_unlabeled_data = (select(data_base.new_data_table.c['row_name',
+                                                              'x_1',
+                                                              'x_2',
+                                                              'x_3',
+                                                              'x_4',
+                                                              'x_5',
+                                                              'x_6',
+                                                              'x_7',
+                                                              'x_8',
+                                                              'x_9',
+                                                              'x_10',])
+                                                              .where(data_base.new_data_table.c.y_pred == Null())
+                                                              )
+    
+    
+    list_of_new_rows = data_base.execute_return(select_unlabeled_data)
 
-    utils_predict.validate_input(unlabeled_data, learned_model)
+    if not list_of_new_rows:
+        print('No new data to predict for')
+    else:
+        unlabeled_data = pd.DataFrame(list_of_new_rows)
 
-    X = utils_predict.preprocess_input(unlabeled_data)
+        learned_model = utils_predict.load_model(args.model_file)
 
-    predicted_labels = learned_model.predict(X)
+        utils_predict.validate_input(unlabeled_data, learned_model)
 
-    labeled_data = unlabeled_data.assign(y_pred = predicted_labels)
+        X = utils_predict.preprocess_input(unlabeled_data)
 
-    labeled_data.to_csv(args.output, sep = ',', index = False)
+        predicted_labels = learned_model.predict(X)
+
+        labeled_data = (unlabeled_data.assign(y_pred = predicted_labels)[['row_name', 'y_pred']]
+                        .rename(columns={'row_name': 'b_row_name', 'y_pred': 'b_y_pred'})
+                        .to_dict(orient='records')
+                        )
+
+
+        update_unlabeled_data = (update(data_base.new_data_table)
+                                .values(y_pred = bindparam('b_y_pred'))
+                                .where(data_base.new_data_table.c.row_name == bindparam('b_row_name'))
+                                )
+        
+        data_base.execute(update_unlabeled_data, labeled_data)

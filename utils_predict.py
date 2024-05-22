@@ -56,10 +56,10 @@ def validate_input(data_matrix: pd.DataFrame, model: custom_types.Scikit_Classif
 
     col_names = data_matrix.columns
 
-    if 'row.names' not in col_names:
-        raise KeyError("'row.names' column is missing from the dataframe")
+    if 'row_name' not in col_names:
+        raise KeyError("'row_name' column is missing from the dataframe")
     
-    df_col_type_check(data_matrix.drop('row.names', axis = 1))
+    df_col_type_check(data_matrix.drop('row_name', axis = 1))
 
     model_features = model.n_features_in_
     data_features = data_matrix.shape[-1] - 1
@@ -69,6 +69,6 @@ def validate_input(data_matrix: pd.DataFrame, model: custom_types.Scikit_Classif
     
 def preprocess_input(data_matrix: pd.DataFrame) -> pd.DataFrame:
 
-    X = data_matrix.drop(['row.names'], axis = 1)
+    X = data_matrix.drop(['row_name'], axis = 1)
 
     return X

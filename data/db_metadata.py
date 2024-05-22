@@ -70,3 +70,11 @@ class VowelDataBase():
                 result = conn.execute(stmt, params)
             data = result.all()
         return data
+    
+    def execute(self, stmt, params: list[dict] = None) -> None:
+
+        with self.engine.begin() as conn:
+            if params is None:
+                conn.execute(stmt)
+            else:
+                conn.execute(stmt, params)
