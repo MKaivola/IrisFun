@@ -40,7 +40,7 @@ if __name__ == '__main__':
                                                           'x_9',
                                                           'x_10'])
 
-    list_of_train_rows = data_base.execute(select_train_data)
+    list_of_train_rows = data_base.execute_return(select_train_data)
 
     train_data = pd.DataFrame(list_of_train_rows)
     utils_train.validate_input(train_data)
@@ -61,7 +61,7 @@ if __name__ == '__main__':
                                                           'x_9',
                                                           'x_10'])
 
-        list_of_test_rows = data_base.execute(select_test_data)
+        list_of_test_rows = data_base.execute_return(select_test_data)
 
         test_data = pd.DataFrame(list_of_test_rows)
         

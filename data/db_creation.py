@@ -50,6 +50,23 @@ test_data_table = Table(
     Column("x_10", Float),
 )
 
+new_data_table = Table(
+    'vowel_new',
+    metadata_obj,
+    Column("row_name", Integer, primary_key=True),
+    Column("y_pred", Integer),
+    Column("x_1", Float),
+    Column("x_2", Float),
+    Column("x_3", Float),
+    Column("x_4", Float),
+    Column("x_5", Float),
+    Column("x_6", Float),
+    Column("x_7", Float),
+    Column("x_8", Float),
+    Column("x_9", Float),
+    Column("x_10", Float),
+)
+
 # Create remaining tables
 metadata_obj.drop_all(engine)
 metadata_obj.create_all(engine)
@@ -63,4 +80,12 @@ test_data_insert = insert(test_data_table)
 with engine.begin() as conn:
     conn.execute(test_data_insert,
                  test_data_records)
+    
+new_data_records = data_utils.df_to_list_of_records(csv_filename='vowel_new.csv')
+
+new_data_insert = insert(new_data_table)
+
+with engine.begin() as conn:
+    conn.execute(new_data_insert,
+                 new_data_records)
 

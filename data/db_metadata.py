@@ -43,8 +43,25 @@ class VowelDataBase():
             Column("x_9", Float),
             Column("x_10", Float),
         )
+
+        self.new_data_table = Table(
+            'vowel_new',
+            self.metadata_obj,
+            Column("row_name", Integer, primary_key=True),
+            Column("y_pred", Integer),
+            Column("x_1", Float),
+            Column("x_2", Float),
+            Column("x_3", Float),
+            Column("x_4", Float),
+            Column("x_5", Float),
+            Column("x_6", Float),
+            Column("x_7", Float),
+            Column("x_8", Float),
+            Column("x_9", Float),
+            Column("x_10", Float),
+)
     
-    def execute(self, stmt, params: list[dict] = None) -> Sequence[Row]:
+    def execute_return(self, stmt, params: list[dict] = None) -> Sequence[Row]:
 
         with self.engine.begin() as conn:
             if params is None:
