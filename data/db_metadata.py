@@ -2,6 +2,50 @@ from typing import Sequence
 
 from sqlalchemy import create_engine, text
 from sqlalchemy import MetaData, Table, Column, Integer, Float, Row
+
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+
+class Base(DeclarativeBase):
+    pass
+
+class TrainData(Base):
+
+    __tablename__ = 'vowel_train'
+
+    row_name: Mapped[int] = mapped_column(primary_key=True)
+    y: Mapped[int]
+    x_1: Mapped[float]
+    x_2: Mapped[float]
+    x_3: Mapped[float]
+    x_4: Mapped[float]
+    x_5: Mapped[float]
+    x_6: Mapped[float]
+    x_7: Mapped[float]
+    x_8: Mapped[float]
+    x_9: Mapped[float]
+    x_10: Mapped[float]
+
+
+class TestData(Base):
+
+    __tablename__ = 'vowel_test'
+
+    row_name: Mapped[int] = mapped_column(primary_key=True)
+    y: Mapped[int]
+    x_1: Mapped[float]
+    x_2: Mapped[float]
+    x_3: Mapped[float]
+    x_4: Mapped[float]
+    x_5: Mapped[float]
+    x_6: Mapped[float]
+    x_7: Mapped[float]
+    x_8: Mapped[float]
+    x_9: Mapped[float]
+    x_10: Mapped[float]
+
+
 class VowelDataBase():
 
     def __init__(self, connection_url: str) -> None:
