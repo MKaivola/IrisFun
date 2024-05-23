@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     data_base = VowelDataBase("sqlite:///data/vowel_data.db")
 
-    select_train_data = select(data_base.train_data_table.c['y',
+    train_data_select_args = (data_base.train_data_table.c['y',
                                                           'x_1',
                                                           'x_2',
                                                           'x_3',
@@ -40,7 +40,7 @@ if __name__ == '__main__':
                                                           'x_9',
                                                           'x_10'])
 
-    list_of_train_rows = data_base.execute_return(select_train_data)
+    list_of_train_rows = data_base.execute_select(train_data_select_args)
 
     train_data = pd.DataFrame(list_of_train_rows)
     utils_train.validate_input(train_data)
@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
     if args.use_test_data:
 
-        select_test_data = select(data_base.test_data_table.c['y',
+        test_data_select_args = (data_base.test_data_table.c['y',
                                                           'x_1',
                                                           'x_2',
                                                           'x_3',
@@ -61,7 +61,7 @@ if __name__ == '__main__':
                                                           'x_9',
                                                           'x_10'])
 
-        list_of_test_rows = data_base.execute_return(select_test_data)
+        list_of_test_rows = data_base.execute_select(test_data_select_args)
 
         test_data = pd.DataFrame(list_of_test_rows)
         

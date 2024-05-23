@@ -1,6 +1,6 @@
 from typing import Sequence
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, select, update
 from sqlalchemy import MetaData, Table, Column, Integer, Float, Row
 
 from sqlalchemy.orm import DeclarativeBase
@@ -103,22 +103,53 @@ class VowelDataBase():
             Column("x_8", Float),
             Column("x_9", Float),
             Column("x_10", Float),
-)
+        )
     
-    def execute_return(self, stmt, params: list[dict] = None) -> Sequence[Row]:
+    def execute_select(self, select_args: list, where_args: list = None) -> Sequence[Row]:
+        """
+        Executes a SELECT statement against a database, returning all fetched rows as a sequence.
+        Optionally includes a WHERE clause in the SELECT statement.
+        
+        Arguments
+        ---------
+        select_args
+            List of positional arguments to pass to select function
+        where_args
+            List of positional arguments to pass to where function
+
+        """
+        stmt = select(*select_args)
+        if where_args is not None:
+            stmt = stmt.where(*where_args)
 
         with self.engine.begin() as conn:
-            if params is None:
-                result = conn.execute(stmt)
-            else:
-                result = conn.execute(stmt, params)
-            data = result.all()
-        return data
-    
-    def execute(self, stmt, params: list[dict] = None) -> None:
+            result = conn.execute(stmt)
 
+        return result.all()
+
+    def execute_update(self, update_args: list, values_args: dict,
+                       where_args: list, data: list[dict]) -> None:
+        """
+        Executes an UPDATE statement against a database
+
+        Arguments
+        ---------
+        update_args
+            List of positional arguments to pass to update function
+        values_args
+            Dictionary specifying column:value pairs to update
+        where_args
+            List of positional arguments to pass to where function
+        data
+            List of parameter dictionaries to bind to a given statement
+
+        """
+
+        stmt = (update(*update_args)
+                .values(values_args)
+                .where(*where_args))
+        
         with self.engine.begin() as conn:
-            if params is None:
-                conn.execute(stmt)
-            else:
-                conn.execute(stmt, params)
+            conn.execute(stmt,
+                         data)
+            

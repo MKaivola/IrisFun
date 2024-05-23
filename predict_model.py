@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     data_base = VowelDataBase("sqlite:///data/vowel_data.db")
 
-    select_unlabeled_data = (select(data_base.new_data_table.c['row_name',
+    unlabeled_data_select_args = [data_base.new_data_table.c['row_name',
                                                               'x_1',
                                                               'x_2',
                                                               'x_3',
@@ -28,12 +28,12 @@ if __name__ == '__main__':
                                                               'x_7',
                                                               'x_8',
                                                               'x_9',
-                                                              'x_10',])
-                                                              .where(data_base.new_data_table.c.y_pred == Null())
-                                                              )
+                                                              'x_10']]
     
+    unlabeled_data_where_args = [data_base.new_data_table.c.y_pred == Null()]
     
-    list_of_new_rows = data_base.execute_return(select_unlabeled_data)
+    list_of_new_rows = data_base.execute_select(unlabeled_data_select_args, 
+                                                unlabeled_data_where_args)
 
     if not list_of_new_rows:
         print('No new data to predict for')
@@ -53,10 +53,11 @@ if __name__ == '__main__':
                         .to_dict(orient='records')
                         )
 
-
-        update_unlabeled_data = (update(data_base.new_data_table)
-                                .values(y_pred = bindparam('b_y_pred'))
-                                .where(data_base.new_data_table.c.row_name == bindparam('b_row_name'))
-                                )
+        label_data_update_args = [data_base.new_data_table]
+        label_data_values_args = {'y_pred': bindparam('b_y_pred')}
+        label_data_where_args = [data_base.new_data_table.c.row_name == bindparam('b_row_name')]
         
-        data_base.execute(update_unlabeled_data, labeled_data)
+        data_base.execute_update(label_data_update_args,
+                                 label_data_values_args,
+                                 label_data_where_args,
+                                 labeled_data)
