@@ -16,7 +16,7 @@ parser.add_argument("model_file",
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    data_base = VowelDataBase("sqlite:///data/vowel_data.db")
+    data_base = VowelDataBase("postgresql://Mikko:password@db:5432/VowelDataBase")
 
     unlabeled_data_select_args = [data_base.new_data_table.c['row_name',
                                                               'x_1',

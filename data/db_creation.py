@@ -6,7 +6,7 @@ import pandas as pd
 
 import data_utils
 
-engine = create_engine("sqlite:///vowel_data.db", echo = False)
+engine = create_engine("postgresql://Mikko:password@db:5432/VowelDataBase", echo = False)
 
 ### Table Creation (Textual SQL) ###
 with engine.begin() as conn:

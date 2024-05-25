@@ -1,0 +1,31 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+# Here the instructions define your application as a service called "myapp".
+# This service is built from the Dockerfile in the current directory.
+services:
+  myapp:
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    stdin_open: true
+    volumes:
+    - model-files:/app/models
+
+  db:
+    image: postgres:16.3
+    container_name: VowelDataBase
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=Mikko
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=VowelDataBase
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
+  model-files:
