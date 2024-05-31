@@ -11,7 +11,7 @@ This will create a service stack containing a Postgres database service and a De
 environment where Python code is executed. Currently one has to enter the myapp container
 directly in order to execute code.
 
-- [] Implement the inference service as a server
+- [ ] Implement the inference service as a server
 
 The database is populated using the `data/db_creation.py` script. Currently, the script uses the
 Vowel dataset from [Elements of Statistical Learning](https://hastie.su.domains/ElemStatLearn/).
