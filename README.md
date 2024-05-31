@@ -20,4 +20,4 @@ data. The "new" data is just the test data without the class labels.
 
 Currently there is no functionality for adding additional data to the database beyond the `data/db_creation.py` script.
 
-- [] Implement an API for adding new data to the existing database from the inference service
+- [ ] Implement an API for adding new data to the existing database from the inference service
